@@ -1,22 +1,23 @@
 ﻿using System;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Net.Http;
-using System.Net.Http.Json; //Requires nuget package System.Net.Http.Json
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using System.Text;
-using System.Text.Json;
-
+using System.Threading;
+using System.Threading.Tasks;
 using Weather.Models;
 using Weather.Services;
 
 namespace Weather.Consoles
 {
     //Your can move your Console application Main here. Rename Main to myMain and make it NOT static and async
+
+
     class Program
     {
+
+        //Register the event
+
+
         #region used by the Console
         Views.ConsolePage theConsole;
         StringBuilder theConsoleString;
@@ -32,42 +33,109 @@ namespace Weather.Consoles
         //This is the method you replace with your async method renamed and NON static Main
         public async Task myMain()
         {
-            theConsole.WriteLine("Demo program output");
+            OpenWeatherService service = new OpenWeatherService();
+            service.WeatherForecastAvailable += ReportWeatherDataAvailable;
 
-            //Write an output to the Console
-            theConsole.Write("One ");
-            theConsole.Write("Two ");
-            theConsole.WriteLine("Three and end the line");
-
-            //As theConsole.WriteLine return trips are quite slow in UWP, use instead of myConsoleString to build the the more complex output
-            //string using several myConsoleString.AppendLine instead of several theConsole.WriteLine. 
-            foreach (char c in "Hello World from my Console program")
+            Task<Forecast> t1 = null, t2 = null, t3 = null, t4 = null;
+            //List<Forecast> forecasts = new List<Forecast>();
+            Exception exception = null;
+            try
             {
-                theConsoleString.Append(c);
+                double latitude = 59.5086798659495;
+                double longitude = 18.2654625932976;
+                /*forecasts.Add(await service.GetForecastAsync(latitude, longitude));
+                theConsole.WriteLine(forecasts[0].City);*/
+
+                //Create the two tasks and wait for comletion
+                await service.GetForecastAsync(latitude, longitude);
+                await service.GetForecastAsync("Uppsala");
+                t1 = service.GetForecastAsync(latitude, longitude);
+                t2 = service.GetForecastAsync("Uppsala");
+                Task.WaitAll(t1, t2);
+
+
+
+            }
+            catch (Exception ex)
+            {
+                //if exception write the message later
+                exception = ex;
+                theConsole.WriteLine(ex.Message);
             }
 
-            //Once the string is complete Write it to the Console
-            theConsole.WriteLine(theConsoleString.ToString());
+            theConsoleString.AppendLine("-----------------");
 
-            theConsole.WriteLine("Wait for 2 seconds...");
-            await Task.Delay(2000);
-
-            //Finally, demonstrating getting some data async
-            theConsole.WriteLine("Download from https://dotnet.microsoft.com/...");
-            theConsoleString.Clear();
-            using (var w = new WebClient())
+            if (t1?.Status == TaskStatus.RanToCompletion)
             {
-                string str = await w.DownloadStringTaskAsync("https://dotnet.microsoft.com/");
-                theConsoleString.Append($"Nr of characters downloaded: {str.Length}");
+                Forecast forecast = t1.Result;
+                theConsoleString.AppendLine($"Weather forecast for {forecast.City}");
+                var GroupedList = forecast.Items.GroupBy(item => item.DateTime.Date);
+                foreach (var group in GroupedList)
+                {
+                    theConsoleString.AppendLine(group.Key.Date.ToShortDateString());
+                    foreach (var item in group)
+                    {
+                        theConsole.WriteLine($"   - {item.DateTime.ToShortTimeString()}: {item.Description}, temperature: {item.Temperature} degC, wind: {item.WindSpeed} m/s");
+                    }
+                }
             }
-            theConsole.WriteLine(theConsoleString.ToString());
+            else
+            {
+                theConsoleString.AppendLine($"Geolocation weather service error.");
+                theConsoleString.AppendLine($"Error: {exception.Message}");
+            }
+
+            Console.WriteLine("-----------------");
+            if (t2.Status == TaskStatus.RanToCompletion)
+            {
+                Forecast forecast = t2.Result;
+                theConsoleString.AppendLine($"Weather forecast for {forecast.City}");
+                var GroupedList = forecast.Items.GroupBy(item => item.DateTime.Date);
+                foreach (var group in GroupedList)
+                {
+                    theConsoleString.AppendLine(group.Key.Date.ToShortDateString());
+                    foreach (var item in group)
+                    {
+                        theConsole.WriteLine($"   - {item.DateTime.ToShortTimeString()}: {item.Description}, temperature: {item.Temperature} degC, wind: {item.WindSpeed} m/s");
+                    }
+                }
+            }
+            else
+            {
+                theConsoleString.AppendLine($"Geolocation weather service error.");
+                theConsoleString.AppendLine($"Error: {exception.Message}");
+            }
+            /*foreach (var forecast in forecasts)
+            {
+                theConsoleString.AppendLine(".....");
+                if (forecast != null)
+                {
+                    theConsoleString.AppendLine($"Weather forecast for {forecast.City}");
+                    var GroupedList = forecast.Items.GroupBy(item => item.DateTime.Date);
+                    foreach (var group in GroupedList)
+                    {
+                        theConsole.WriteLine(group.Key.Date.ToShortDateString());
+                        foreach (var item in group)
+                        {
+
+                            theConsole.WriteLine($"   - {item.DateTime.ToShortTimeString()}: {item.Description}, temperature: {item.Temperature} degC, wind: {item.WindSpeed} m/s");
+                        }
+                    }
+                }
+                else
+                {
+                    theConsoleString.AppendLine($"Geolocation weather service error.");
+                    theConsoleString.AppendLine($"Error: {exception.Message}");
+                }*/
         }
-
-        //If you have any event handlers, they could be placed here
-        void myEventHandler(object sender, string message)
+        void ReportWeatherDataAvailable(object sender, string message)
         {
-            theConsole.WriteLine($"Event message: {message}"); //theConsole is a Captured Variable, don't use myConsoleString here
+            theConsole.WriteLine($"Event message from weather service: {message}");
         }
+
+
         #endregion
+
+
     }
 }
