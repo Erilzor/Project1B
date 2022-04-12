@@ -24,25 +24,28 @@ namespace Weather.Views
         public ForecastPage()
         {
             InitializeComponent();
-            
+
             service = new OpenWeatherService();
             groupedforecast = new GroupedForecast();
         }
 
-        protected override void OnAppearing()
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
 
-            //Code here will run right before the screen appears
-            //You want to set the Title or set the City
-
-            //This is making the first load of data
-            MainThread.BeginInvokeOnMainThread(async () => {await LoadForecast();});
+            MainThread.BeginInvokeOnMainThread(async () => { await LoadForecast(); });
+        }
+        private async void Button_Clicked(object sender, EventArgs e)
+        {
+            await LoadForecast();
         }
 
         private async Task LoadForecast()
         {
-            //Heare you load the forecast 
+            Forecast forecast = await service.GetForecastAsync(Title);
+
+            groupedforecast.Items = forecast.Items.GroupBy(item => item.DateTime.Date);
+            weatherListView.ItemsSource = groupedforecast.Items;
         }
     }
 }
