@@ -10,7 +10,7 @@
               HasUnevenRows="true"
               ItemsSource="{Binding MenuItems}">
             <ListView.Header>
-                <Grid BackgroundColor="#03A9F4">
+                <Grid Background="Väder.jpg">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="10"/>
                         <ColumnDefinition Width="*"/>
@@ -34,7 +34,7 @@
                     <ViewCell>
 
                         <StackLayout Padding="15,10" HorizontalOptions="FillAndExpand">
-                            <Image Source="{Binding Image}" HorizontalOptions="FillAndExpand" WidthRequest="50"/>
+                            <Image Source="{Binding Image}" HorizontalOptions="FillAndExpand" WidthRequest="2000"/>
                             <Label VerticalOptions="FillAndExpand" 
                     VerticalTextAlignment="Center" 
                     Text="{Binding Title}" 

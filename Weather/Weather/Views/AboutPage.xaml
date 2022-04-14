@@ -4,8 +4,8 @@
              x:Class="Weather.Views.AboutPage"
              Title="Weather Application">
 
-    <StackLayout>
-        <Frame BackgroundColor="Beige" Padding="24" CornerRadius="0">
+    <StackLayout BackgroundColor="Beige" HorizontalOptions="Fill">
+        <Frame >
             <Label Text="Awesome WeatherApp" HorizontalTextAlignment="Center" TextColor="Black" FontSize="36"/>
         </Frame>
         <Label Text="Weather Application" FontSize="Title" Padding="30,10,30,10"/>

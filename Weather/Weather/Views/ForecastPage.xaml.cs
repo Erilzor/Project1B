@@ -29,7 +29,7 @@ namespace Weather.Views
             groupedforecast = new GroupedForecast();
         }
 
-        protected override async void OnAppearing()
+        protected override void OnAppearing()
         {
             base.OnAppearing();
 

@@ -4,7 +4,9 @@
              x:Class="Weather.Views.ForecastPage">
     <ContentPage.Content>
         <StackLayout>
-            <Button Text="Refresh" Clicked="Button_Clicked"/>
+            <StackLayout>
+                <Button Text="Refresh" Clicked="Button_Clicked"/>
+            </StackLayout>
             <ListView               
              x:Name="weatherListView" IsGroupingEnabled="True" HasUnevenRows="True">
                 <ListView.GroupHeaderTemplate>
@@ -20,9 +22,13 @@
                     <DataTemplate>
                         <ViewCell>
                             <StackLayout HorizontalOptions="Start" Orientation="Vertical">
-                                <Image Source="{Binding Image}" HorizontalOptions="FillAndExpand" WidthRequest="100"/>
-                                <Label FontSize="14" FontAttributes="Bold" Text="{Binding DateTime, StringFormat='{0:HH:mm:ss}'}" TextColor="Black" />
-                                <Label Text="{Binding .}"/>
+                                 <StackLayout HorizontalOptions="Start" Orientation="Vertical" Padding=" 3">
+                                    <Image Source="{Binding Image}" HorizontalOptions="FillAndExpand" WidthRequest="100"/>
+                                 </StackLayout>
+                                 <StackLayout>
+                                    <Label FontSize="14" FontAttributes="Bold" Text="{Binding DateTime, StringFormat='{0:HH:mm:ss}'}" TextColor="Black" />
+                                    <Label Text="{Binding .}"/>
+                                 </StackLayout>
                             </StackLayout>
                         </ViewCell>
                     </DataTemplate>
